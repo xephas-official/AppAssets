@@ -1,0 +1,4 @@
+This is the structure of the raw assets on github
+
+For the cover
+https://raw.githubusercontent.com/xephas-official/AppAssets/refs/heads/main/linkyoo/meta/Linkyoo-Editor-Cover.webp
