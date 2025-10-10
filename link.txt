@@ -1,4 +1,12 @@
 This is the structure of the raw assets on github
 
 For the cover
+
+Meta Folder:
 https://raw.githubusercontent.com/xephas-official/AppAssets/refs/heads/main/linkyoo/meta/Linkyoo-Editor-Cover.webp
+
+Placeholder Folder:
+https://raw.githubusercontent.com/xephas-official/AppAssets/refs/heads/main/linkyoo/meta/Linkyoo-Editor-Cover.webp
+
+Blog Folder:
+https://raw.githubusercontent.com/xephas-official/AppAssets/refs/heads/main/linkyoo/blog/Linkyoo-Editor-Blog.webp

@@ -1,0 +1,3 @@
+
+Placeholders Folder:
+node generate-link.js placeholders kalya-courts.webp
