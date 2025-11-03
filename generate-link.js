@@ -13,8 +13,6 @@ const REPO_NAME = 'AppAssets';
 const BRANCH = 'main';
 const PROJECT_PATH = 'linkyoo';
 
-const FOLDERS = ['meta', 'placeholders', 'blog'];
-
 /**
  * Generate a GitHub raw content link
  * @param {string} folder - The folder name (meta, placeholders, or blog)
@@ -23,6 +21,39 @@ const FOLDERS = ['meta', 'placeholders', 'blog'];
  */
 function generateLink(folder, filename) {
   return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/${BRANCH}/${PROJECT_PATH}/${folder}/${filename}`;
+}
+
+/**
+ * Get all available folders in the project path
+ * @returns {Array} Array of folder names
+ */
+function getAvailableFolders() {
+  const projectPath = path.join(__dirname, PROJECT_PATH);
+  
+  if (!fs.existsSync(projectPath)) {
+    return [];
+  }
+
+  try {
+    return fs.readdirSync(projectPath)
+      .filter(item => {
+        const itemPath = path.join(projectPath, item);
+        return !item.startsWith('.') && fs.statSync(itemPath).isDirectory();
+      });
+  } catch (error) {
+    console.error(`Error reading project folders: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Check if a folder exists in the project path
+ * @param {string} folder - The folder name to check
+ * @returns {boolean} True if folder exists
+ */
+function folderExists(folder) {
+  const folderPath = path.join(__dirname, PROJECT_PATH, folder);
+  return fs.existsSync(folderPath) && fs.statSync(folderPath).isDirectory();
 }
 
 /**
@@ -66,6 +97,11 @@ function getFilesInFolder(folder) {
  * Display usage instructions
  */
 function showUsage() {
+  const availableFolders = getAvailableFolders();
+  const folderList = availableFolders.length > 0 
+    ? availableFolders.join(', ') 
+    : 'No folders found';
+  
   console.log(`
 Usage: node generate-link.js <path>
 
@@ -83,7 +119,7 @@ Examples:
   node generate-link.js placeholders
   node generate-link.js blog
 
-Available folders: ${FOLDERS.join(', ')}
+Available folders: ${folderList}
   `);
 }
 
@@ -109,9 +145,12 @@ if (pathParts.length === 1) {
   // Just a folder - generate links for all files
   const folder = pathParts[0];
   
-  if (!FOLDERS.includes(folder)) {
-    console.error(`Error: Invalid folder "${folder}". Must be one of: ${FOLDERS.join(', ')}\n`);
-    showUsage();
+  if (!folderExists(folder)) {
+    const availableFolders = getAvailableFolders();
+    console.error(`Error: Folder "${folder}" does not exist in ${PROJECT_PATH}/\n`);
+    if (availableFolders.length > 0) {
+      console.error(`Available folders: ${availableFolders.join(', ')}\n`);
+    }
     process.exit(1);
   }
 
@@ -134,9 +173,12 @@ if (pathParts.length === 1) {
   const [folder, filename] = pathParts;
 
   // Validate folder
-  if (!FOLDERS.includes(folder)) {
-    console.error(`Error: Invalid folder "${folder}". Must be one of: ${FOLDERS.join(', ')}\n`);
-    showUsage();
+  if (!folderExists(folder)) {
+    const availableFolders = getAvailableFolders();
+    console.error(`Error: Folder "${folder}" does not exist in ${PROJECT_PATH}/\n`);
+    if (availableFolders.length > 0) {
+      console.error(`Available folders: ${availableFolders.join(', ')}\n`);
+    }
     process.exit(1);
   }
 
