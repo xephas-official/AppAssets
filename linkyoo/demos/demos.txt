@@ -1,0 +1,1 @@
+This will hold images for demo businesses so that we don't use our firebase storage for demo purposes. We can just link to these images in our code and they will be used for the demo businesses. This way we can keep our firebase storage clean and only use it for real businesses.

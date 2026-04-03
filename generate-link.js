@@ -15,12 +15,11 @@ const PROJECT_PATH = 'linkyoo';
 
 /**
  * Generate a GitHub raw content link
- * @param {string} folder - The folder name (meta, placeholders, or blog)
- * @param {string} filename - The filename with extension
+ * @param {string} relativePath - The relative path within the project folder
  * @returns {string} The complete GitHub raw content URL
  */
-function generateLink(folder, filename) {
-  return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/${BRANCH}/${PROJECT_PATH}/${folder}/${filename}`;
+function generateLink(relativePath) {
+  return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/${BRANCH}/${PROJECT_PATH}/${relativePath}`;
 }
 
 /**
@@ -58,11 +57,11 @@ function folderExists(folder) {
 
 /**
  * Get all files in a folder sorted by modification time (newest first)
- * @param {string} folder - The folder name
+ * @param {string} relativePath - The relative path within the project folder
  * @returns {Array} Array of filenames sorted by newest first
  */
-function getFilesInFolder(folder) {
-  const folderPath = path.join(__dirname, PROJECT_PATH, folder);
+function getFilesInFolder(relativePath) {
+  const folderPath = path.join(__dirname, PROJECT_PATH, relativePath);
   
   if (!fs.existsSync(folderPath)) {
     console.error(`Error: Folder "${folderPath}" does not exist.`);
@@ -138,58 +137,41 @@ if (args.length !== 1) {
 }
 
 const input = args[0];
-const pathParts = input.split('/');
+const localPath = path.join(__dirname, PROJECT_PATH, input);
 
-// Check if it's just a folder name or a full path
-if (pathParts.length === 1) {
-  // Just a folder - generate links for all files
-  const folder = pathParts[0];
-  
-  if (!folderExists(folder)) {
-    const availableFolders = getAvailableFolders();
-    console.error(`Error: Folder "${folder}" does not exist in ${PROJECT_PATH}/\n`);
-    if (availableFolders.length > 0) {
-      console.error(`Available folders: ${availableFolders.join(', ')}\n`);
-    }
-    process.exit(1);
+if (!fs.existsSync(localPath)) {
+  const availableFolders = getAvailableFolders();
+  console.error(`Error: Path "${input}" does not exist in ${PROJECT_PATH}/\n`);
+  if (availableFolders.length > 0) {
+    console.error(`Available folders: ${availableFolders.join(', ')}\n`);
   }
+  process.exit(1);
+}
 
-  const files = getFilesInFolder(folder);
-  
+const stat = fs.statSync(localPath);
+
+if (stat.isDirectory()) {
+  const files = getFilesInFolder(input);
+
   if (files.length === 0) {
-    console.log(`\nNo files found in "${folder}" folder.\n`);
+    console.log(`\nNo files found in "${input}".\n`);
     process.exit(0);
   }
 
-  console.log(`\nGenerated Links for "${folder}" folder (${files.length} file${files.length > 1 ? 's' : ''}, sorted by newest first):\n`);
+  console.log(`\nGenerated Links for "${input}" (${files.length} file${files.length > 1 ? 's' : ''}, sorted by newest first):\n`);
   files.forEach((filename, index) => {
-    const link = generateLink(folder, filename);
+    const link = generateLink(`${input}/${filename}`);
     console.log(`${index + 1}. ${filename}`);
     console.log(`   ${link}\n`);
   });
-  
-} else if (pathParts.length === 2) {
-  // Full path with folder/filename
-  const [folder, filename] = pathParts;
 
-  // Validate folder
-  if (!folderExists(folder)) {
-    const availableFolders = getAvailableFolders();
-    console.error(`Error: Folder "${folder}" does not exist in ${PROJECT_PATH}/\n`);
-    if (availableFolders.length > 0) {
-      console.error(`Available folders: ${availableFolders.join(', ')}\n`);
-    }
-    process.exit(1);
-  }
-
-  // Generate and display the link
-  const link = generateLink(folder, filename);
+} else if (stat.isFile()) {
+  const link = generateLink(input);
   console.log('\nGenerated Link:');
   console.log(link);
   console.log('');
-  
+
 } else {
-  console.error('Error: Path must be in the format: folder/filename or just folder\n');
-  showUsage();
+  console.error(`Error: "${input}" is neither a file nor a directory.\n`);
   process.exit(1);
 }
