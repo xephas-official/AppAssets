@@ -14,12 +14,26 @@ const BRANCH = 'main';
 const PROJECT_PATH = 'linkyoo';
 
 /**
+ * URL-encode a path while preserving slashes as path separators.
+ * Each segment is encoded individually so spaces and other special
+ * characters become web-safe (e.g. "Receive Payments.png" -> "Receive%20Payments.png").
+ * @param {string} relativePath - The relative path to encode
+ * @returns {string} The path with each segment URL-encoded
+ */
+function encodePath(relativePath) {
+  return relativePath
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/');
+}
+
+/**
  * Generate a GitHub raw content link
  * @param {string} relativePath - The relative path within the project folder
- * @returns {string} The complete GitHub raw content URL
+ * @returns {string} The complete GitHub raw content URL (web-safe)
  */
 function generateLink(relativePath) {
-  return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/${BRANCH}/${PROJECT_PATH}/${relativePath}`;
+  return `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/${BRANCH}/${PROJECT_PATH}/${encodePath(relativePath)}`;
 }
 
 /**
