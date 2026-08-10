@@ -123,6 +123,7 @@ Arguments:
 
 Examples:
   # Generate link for a specific file:
+  node generate-link.js covers/buule.jpeg
   node generate-link.js meta/Linkyoo-Editor-Cover.webp
   node generate-link.js blog/Linkyoo-Editor-Blog.webp
   node generate-link.js placeholders/kalya-placeholder.webp
