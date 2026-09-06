@@ -11,7 +11,7 @@ const path = require('path');
 const REPO_OWNER = 'xephas-official';
 const REPO_NAME = 'AppAssets';
 const BRANCH = 'main';
-const PROJECT_PATH = 'linkyoo';
+const PROJECT_PATH = 'laces';
 
 /**
  * URL-encode a path while preserving slashes as path separators.
